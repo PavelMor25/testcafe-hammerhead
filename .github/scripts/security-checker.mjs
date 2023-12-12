@@ -68,7 +68,6 @@ class SecurityChecker {
   }
 
   createAlertDictionary (existedIssues) {
-      console.log(existedIssues)
       return existedIssues.reduce((res, issue) => {
           const [, repo] = issue.body.match(/Repository:\s*(.*)(\n)/);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
@@ -193,7 +192,7 @@ class SecurityChecker {
   }
 
   needCreateIssue (alert) {
-      return !this.alertDictionary[alert.rule.description] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
+      return !this.alertDictionary[alert.security_advisory.summary] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
   }
 
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }) {
