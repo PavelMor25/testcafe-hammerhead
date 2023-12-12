@@ -75,7 +75,7 @@ class SecurityChecker {
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
           const [, ghsaIdId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
 
-          if (!url || repo.search(this.context.repo) !== -1)
+          if (!url)
               return res;
 
           res[issue.title] = { issue, type, cveId, ghsaIdId };
