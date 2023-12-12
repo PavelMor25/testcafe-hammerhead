@@ -169,8 +169,8 @@ class SecurityChecker {
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
-                    + `#### Link: ${link}`
-                    + `#### CVE ID: \`${cveId}\``
+                    + `#### Link: ${link}\n`
+                    + `#### CVE ID: \`${cveId}\`\n`
                     + `#### GHSA ID: \`${ghsaId}\``
 
       return this.github.rest.issues.create({
