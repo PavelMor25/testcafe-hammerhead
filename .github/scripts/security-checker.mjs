@@ -137,6 +137,8 @@ class SecurityChecker {
               description:  alert.security_advisory.description,
               link:         alert.html_url,
               issuePackage: alert.dependency.package.name,
+              cveId:        alert.security_advisory.cve_id,
+              ghsaId:       alert.security_advisory.ghsa_id,
           });
       }
   }
@@ -160,14 +162,16 @@ class SecurityChecker {
       return !this.alertDictionary[alert.html_url] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
   }
 
-  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }) {
+  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }) {
       const title = `[${originRepo}] ${summary}`;
       const body = ''
                     + `#### Repository: \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
-                    + `#### Link: ${link}`;
+                    + `#### Link: ${link}`
+                    + `#### CVE ID: \`${cveId}\``
+                    + `#### GHSA ID: \`${ghsaId}\``
 
       return this.github.rest.issues.create({
           title, body, labels,
