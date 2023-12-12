@@ -68,6 +68,7 @@ class SecurityChecker {
   }
 
   createAlertDictionary (existedIssues) {
+        console.log(existedIssues)
       return existedIssues.reduce((res, issue) => {
           const [, repo] = issue.body.match(/Repository:\s*(.*)(\n)/);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
