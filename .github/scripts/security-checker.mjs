@@ -128,7 +128,7 @@ class SecurityChecker {
   }
 
   needAddAlertToIssue (alert) {
-      const alertDictionaryItem = this.alertDictionary[alert.rule.description];
+      const alertDictionaryItem = this.alertDictionary[alert.security_advisory.summary];
 
       return alertDictionaryItem 
         && alertDictionaryItem.ghsaId === alert.security_advisory.ghsa_id
@@ -136,7 +136,7 @@ class SecurityChecker {
   }
 
   async AddAlertToIssue (alert) {
-      const issueInfo = this.alertDictionary[alert.rule.description];
+      const issueInfo = this.alertDictionary[alert.security_advisory.summary];
 
       if (issueInfo.repo.search(this.context.repo) === -1)
         return;
