@@ -158,6 +158,8 @@ class SecurityChecker {
 
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
+            console.log(this.needCreateIssue(alert))
+            console.log(this.needAddAlertToIssue(alert))
           if (!this.needCreateIssue(alert))
               return;
 
