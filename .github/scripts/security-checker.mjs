@@ -72,12 +72,12 @@ class SecurityChecker {
           const [, repo] = issue.body.match(/Repository:\s*(.*)/);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
-          const [, ghsaIdId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
+          const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
 
           if (!url)
               return res;
 
-          res[issue.title] = { issue, type, cveId, ghsaIdId, repo };
+          res[issue.title] = { issue, type, cveId, ghsaId, repo };
 
           return res;
       }, {});
@@ -129,6 +129,10 @@ class SecurityChecker {
 
   needAddAlertToIssue (alert) {
       const alertDictionaryItem = this.alertDictionary[alert.security_advisory.summary];
+
+      console.log(alertDictionaryItem)
+      console.log(alertDictionaryItem.ghsaId, alert.security_advisory.ghsa_id)
+      console.log(alertDictionaryItem.cveId, alert.security_advisory.cve_id)
 
       return alertDictionaryItem 
         && alertDictionaryItem.ghsaId === alert.security_advisory.ghsa_id
