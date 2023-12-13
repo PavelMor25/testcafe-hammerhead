@@ -158,13 +158,11 @@ class SecurityChecker {
 
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
-            console.log(this.needCreateIssue(alert))
-            console.log(this.needAddAlertToIssue(alert))
-          if (!this.needCreateIssue(alert))
-              return;
-
           if (this.needAddAlertToIssue(alert))
               await this.AddAlertToIssue(alert);
+        
+          if (this.isIssueCreated(alert))
+              return;
           else {
               await this.createIssue({
                   labels:       [LABELS.dependabot, LABELS.security, alert.dependency.scope],
@@ -182,7 +180,7 @@ class SecurityChecker {
 
   async createCodeqlIssues (codeqlAlerts) {
       for (const alert of codeqlAlerts) {
-          if (!this.needCreateIssue(alert))
+          if (!this.isIssueCreated(alert))
               return;
 
           await this.createIssue({
@@ -195,7 +193,7 @@ class SecurityChecker {
       }
   }
 
-  needCreateIssue (alert) {
+  isIssueCreated (alert) {
       return !this.alertDictionary[alert.security_advisory.summary] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
   }
 
