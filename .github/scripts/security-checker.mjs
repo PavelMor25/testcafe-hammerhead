@@ -130,10 +130,6 @@ class SecurityChecker {
   needAddAlertToIssue (alert) {
       const alertDictionaryItem = this.alertDictionary[alert.security_advisory.summary];
 
-      console.log(alertDictionaryItem)
-      console.log(alertDictionaryItem.ghsaId, alert.security_advisory.ghsa_id)
-      console.log(alertDictionaryItem.cveId, alert.security_advisory.cve_id)
-
       return alertDictionaryItem 
         && alertDictionaryItem.ghsaId === alert.security_advisory.ghsa_id
         && alertDictionaryItem.cveId === alert.security_advisory.cve_id;
@@ -142,13 +138,11 @@ class SecurityChecker {
   async AddAlertToIssue (alert) {
       const issueInfo = this.alertDictionary[alert.security_advisory.summary];
 
-      console.log(issueInfo.repo)
-      console.log(this.context.repo)
-      console.log(issueInfo.repo.search(this.context.repo))
+      console.log(issueInfo.issue)
       if (issueInfo.repo.search(this.context.repo) === -1)
         return;
 
-      const newBody = issueInfo.issue.body.replace(/(?<=Repository:\s).*(?=\n)/gm, (repo) => {
+      const newBody = issueInfo.issue.body.replace(/(?<=Repository:\s).*(?=\n)/, (repo) => {
         return repo + `, \`${this.context.repo}\``
       })
       
