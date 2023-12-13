@@ -69,8 +69,6 @@ class SecurityChecker {
 
   createAlertDictionary (existedIssues) {
       return existedIssues.reduce((res, issue) => {
-        // console.log(issue.body)
-        console.log(issue.body.match(/Repository:\s*(.*)/))
           const [, repo] = issue.body.match(/Repository:\s*(.*)/);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
@@ -140,11 +138,14 @@ class SecurityChecker {
   async AddAlertToIssue (alert) {
       const issueInfo = this.alertDictionary[alert.security_advisory.summary];
 
+      console.log(issueInfo.repo)
+      console.log(this.context.repo)
+      console.log(issueInfo.repo.search(this.context.repo))
       if (issueInfo.repo.search(this.context.repo) === -1)
         return;
 
       const newBody = issueInfo.issue.body.replace(/(?<=Repository:\s).*(?=\n)/gm, (repo) => {
-        return repo + `, ${this.context.repo}`
+        return repo + `, \`${this.context.repo}\``
       })
       
       return this.github.rest.issues.update({
