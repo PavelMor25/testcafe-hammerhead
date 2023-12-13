@@ -149,7 +149,7 @@ class SecurityChecker {
       return this.github.rest.issues.update({
         owner:        this.context.owner,
         repo:         this.issueRepo,
-        issue_number: issueInfo.issue.issueNumber,
+        issue_number: issueInfo.issue.number,
         body:         newBody,
     });
   }
