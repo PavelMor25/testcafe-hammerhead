@@ -69,7 +69,7 @@ class SecurityChecker {
 
   createAlertDictionary (existedIssues) {
       return existedIssues.reduce((res, issue) => {
-          const [, repo] = issue.body.match(/Repository:\s*(.*)(\n)/);
+          const [, repo] = issue.body.match(/Repository:\s*(.*)(?=\n)/);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
           const [, ghsaIdId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
