@@ -79,7 +79,7 @@ class SecurityChecker {
           if (!url)
               return res;
 
-          res[issue.title] = { issue, type, cveId, ghsaId, repo, body: issue.body };
+          res[issue.title] = { issue, type, cveId, ghsaId, repo};
 
           return res;
       }, {});
@@ -138,16 +138,16 @@ class SecurityChecker {
   }
 
   async updateIssue (alert) {
-    const issue = this.alertDictionary[alert.security_advisory.summary]
+    const { issue } = this.alertDictionary[alert.security_advisory.summary]
 
     const body = issue.body.replace(/Repository:\s*`(.*)`/, (match) => {
-        return match += `-[] \`${this.context.repo}\`\n`;
+        return match += `- [ ] \`${this.context.repo}\`\n`;
     });
 
     return this.github.rest.issues.update({
         owner:        this.context.owner,
         repo:         this.issueRepo,
-        issue_number: issue.issue.number,
+        issue_number: issue.number,
         body,
     });
 
@@ -201,7 +201,7 @@ class SecurityChecker {
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
       const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
       let body = ''
-                    + `#### Repository:\n-[] \`${originRepo}\`\n`
+                    + `#### Repository:\n- [ ] \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
