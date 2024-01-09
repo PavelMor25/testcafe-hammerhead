@@ -71,7 +71,6 @@ class SecurityChecker {
 
   createAlertDictionary (existedIssues) {
       return existedIssues.reduce((res, issue) => {
-        console.log(issue.body)
           const [repo] = issue.body.match(/(?<=Repository:)[\s\S]*?(?=####|$)/g);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
@@ -135,7 +134,7 @@ class SecurityChecker {
     return existIssue 
         && existIssue.cveId === alert.security_advisory.cve_id
         && existIssue.ghsaId === alert.security_advisory.ghsa_id
-        && existIssue.repo.search(this.context.repo) === -1;
+        && existIssue.repo.search(`\`${this.context.repo}\``) === -1;
   }
 
   async updateIssue (alert) {
