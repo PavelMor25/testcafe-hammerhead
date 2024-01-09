@@ -131,14 +131,10 @@ class SecurityChecker {
   }
 
   needUpdateIssue (alert) {
-    console.log('update')
-    console.log(alert)
-    console.log('----')
     const existIssue = this.alertDictionary[alert.security_advisory.summary]
-    console.log(existIssue)
     return existIssue 
         && existIssue.cveId === alert.security_advisory.cve_id
-        && existIssue.ghsaId === alert.security_advisory.ghsa_Id
+        && existIssue.ghsaId === alert.security_advisory.ghsa_id
         && existIssue.repo.search(this.context.repo) === -1;
   }
 
@@ -161,6 +157,7 @@ class SecurityChecker {
 
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
+        console.log(this.needUpdateIssue(alert))
           if (this.needUpdateIssue(alert)) {
               await this.updateIssue(alert)
               continue
