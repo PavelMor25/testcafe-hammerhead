@@ -168,7 +168,7 @@ class SecurityChecker {
       return !this.alertDictionary[alert.security_advisory.summary];
   }
 
-  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }, isDependabotAlert = true) {
+  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
       const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
       const body = ''
                     + `#### Repository: \`${originRepo}\`\n`
