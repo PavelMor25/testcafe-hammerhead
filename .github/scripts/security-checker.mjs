@@ -98,10 +98,10 @@ class SecurityChecker {
               const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
               console.log(isAlertOpened)
 
-              if (isAlertOpened)
+              if (!isAlertOpened)
                   continue;
 
-              await this.closeIssue(alert.issue.number);
+              await this.closeIssue(alert.issue);
           }
       }
   }
@@ -126,12 +126,17 @@ class SecurityChecker {
       }
   }
 
-  async closeIssue (issueNumber) {
+  async closeIssue (issue) {
+      issue.body = issue.body.replace(new RegExp(`[ ](?= \`${this.context.repo}\`)`), () => '[x]');
+
+      const alertCheckbox = issue.body.match('[x]');
+
       return this.github.rest.issues.update({
           owner:        this.context.owner,
           repo:         this.issueRepo,
           issue_number: issueNumber,
-          state:        STATES.closed,
+          state:        !alertCheckbox ? STATES.closed : STATES.open,
+          body:         issue.body,
       });
   }
 
