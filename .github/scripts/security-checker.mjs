@@ -79,7 +79,7 @@ class SecurityChecker {
           if (!url)
               return res;
 
-          res[issue.title] = { issue, type, cveId, ghsaId, repo };
+          res[issue.title] = { issue, type, cveId, ghsaId, repo, body };
 
           return res;
       }, {});
