@@ -143,7 +143,7 @@ class SecurityChecker {
 
     const body = issue.body.replace(/(?<=Repository:)[\s\S]*?(?=####|$)/g, (match) => {
         console.log('match', match)
-        return match += `- [ ] \`${this.context.repo}\`\n`;
+        return match += `- [ ] \`${this.context.repo}\` - Link: ${alert.html_url}\n`;
     });
 
     return this.github.rest.issues.update({
@@ -157,7 +157,6 @@ class SecurityChecker {
 
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
-        console.log(this.needUpdateIssue(alert))
           if (this.needUpdateIssue(alert)) {
               await this.updateIssue(alert)
               continue
@@ -195,8 +194,6 @@ class SecurityChecker {
   }
 
   needCreateIssue (alert) {
-    //   console.log('alertCheck')
-    //   console.log(!this.alertDictionary[alert.security_advisory.summary])
     //   console.log(Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24)
       return !this.alertDictionary[alert.security_advisory.summary];
   }
@@ -204,11 +201,10 @@ class SecurityChecker {
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
       const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
       let body = ''
-                    + `#### Repository:\n- [ ] \`${originRepo}\`\n`
+                    + `#### Repository:\n- [ ] \`${originRepo}\` - Link: ${link}\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
-                    + `#### Link: ${link}`;
 
         if  (isDependabotAlert)
             body += `\n#### CVE ID: \`${cveId}\`\n#### GHSA ID: \`${ghsaId}\``;
