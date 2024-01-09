@@ -165,7 +165,7 @@ class SecurityChecker {
       console.log('alertCheck')
       console.log(!this.alertDictionary[alert.security_advisory.summary])
       console.log(Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24)
-      return !this.alertDictionary[alert.security_advisory.summary] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
+      return !this.alertDictionary[alert.security_advisory.summary];
   }
 
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }, isDependabotAlert = true) {
