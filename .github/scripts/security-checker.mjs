@@ -141,7 +141,7 @@ class SecurityChecker {
           owner:        this.context.owner,
           repo:         this.issueRepo,
           issue_number: issue.number,
-          state:        !alertCheckbox ? STATES.closed : STATES.open,
+        //   state:        !alertCheckbox ? STATES.closed : STATES.open,
           body:         issue.body,
       });
   }
