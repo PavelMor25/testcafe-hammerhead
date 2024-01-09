@@ -33,7 +33,7 @@ class SecurityChecker {
 
       this.alertDictionary = this.createAlertDictionary(existedIssues);
 
-    //   await this.closeSpoiledIssues();
+      await this.closeSpoiledIssues();
       await this.createDependabotlIssues(dependabotAlerts);
       await this.createCodeqlIssues(codeqlAlerts);
   }
@@ -90,7 +90,13 @@ class SecurityChecker {
           const alert = this.alertDictionary[key];
 
           if (alert.type === ALERT_TYPES.dependabot) {
-              const isAlertOpened = await this.isDependabotAlertOpened(alert.number);
+              const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))`));
+
+              console.log(matchAlertInIssue)
+              if (!matchAlertInIssue) 
+                continue;
+
+              const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
 
               if (isAlertOpened)
                   continue;
