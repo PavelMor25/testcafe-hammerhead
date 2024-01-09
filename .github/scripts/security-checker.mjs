@@ -170,7 +170,7 @@ class SecurityChecker {
 
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
       const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
-      const body = ''
+      let body = ''
                     + `#### Repository: \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
