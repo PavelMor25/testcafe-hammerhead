@@ -92,16 +92,16 @@ class SecurityChecker {
           if (alert.type === ALERT_TYPES.dependabot) {
 
               const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - Link:\\s*(https:.*/(dependabot|code-scanning)/(\\d+))`));
+              
               if (!matchAlertInIssue) 
                 continue;
 
               const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
-              console.log(isAlertOpened)
 
-              if (!isAlertOpened)
+              if (isAlertOpened)
                   continue;
 
-              await this.closeIssue(alert.issue);
+              await this.closeAlertOrIssue(alert.issue);
           }
       }
   }
@@ -126,18 +126,16 @@ class SecurityChecker {
       }
   }
 
-  async closeIssue (issue) {
+  async closeAlertOrIssue (issue) {
       issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), '[x]');
-      console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`))
-      console.log(issue.body)
 
-      const alertCheckbox = issue.body.match(/\[ \]/);
+      const unresolvedAlertCheckbox = issue.body.match(/\[ \]/);
 
       return this.github.rest.issues.update({
           owner:        this.context.owner,
           repo:         this.issueRepo,
           issue_number: issue.number,
-          state:        !alertCheckbox ? STATES.closed : STATES.open,
+          state:        !unresolvedAlertCheckbox ? STATES.closed : STATES.open,
           body:         issue.body,
       });
   }
@@ -150,7 +148,7 @@ class SecurityChecker {
         && existIssue.repo.search(`\`${this.context.repo}\``) === -1;
   }
 
-  async updateIssue (alert) {
+  async addAlertToIssue (alert) {
     const { issue } = this.alertDictionary[alert.security_advisory.summary]
 
     const body = issue.body.replace(/(?<=Repository:)[\s\S]*?(?=####|$)/g, (match) => {
@@ -169,7 +167,7 @@ class SecurityChecker {
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
           if (this.needUpdateIssue(alert)) {
-              await this.updateIssue(alert)
+              await this.addAlertToIssue(alert)
               continue
           }
 
