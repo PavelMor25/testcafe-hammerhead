@@ -127,9 +127,7 @@ class SecurityChecker {
   }
 
   async closeIssue (issue) {
-      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), () => {
-        return '[x]'
-    });
+      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), () => `[x]`);
       console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`))
       console.log(issue.body)
 
@@ -158,7 +156,6 @@ class SecurityChecker {
     const { issue } = this.alertDictionary[alert.security_advisory.summary]
 
     const body = issue.body.replace(/(?<=Repository:)[\s\S]*?(?=####|$)/g, (match) => {
-        console.log('match', match)
         return match += `- [ ] \`${this.context.repo}\` - Link: ${alert.html_url}\n`;
     });
 
