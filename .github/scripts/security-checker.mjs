@@ -127,11 +127,13 @@ class SecurityChecker {
   }
 
   async closeIssue (issue) {
-      issue.body = issue.body.replace(new RegExp(`[ ](?= \`${this.context.repo}\`)`), () => '[x]');
+      issue.body = issue.body.replace(new RegExp(`[ ](?= \`${this.context.repo}\`)`), (s) => {
+        console.log('ss',s)
+    });
       console.log(new RegExp(`[ ](?= \`${this.context.repo}\`)`))
       console.log(issue.body)
 
-      const alertCheckbox = issue.body.match('[x]');
+      const alertCheckbox = issue.body.match(/\[x\]/);
 
       console.log(alertCheckbox)
 
