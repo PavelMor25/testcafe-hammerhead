@@ -127,19 +127,17 @@ class SecurityChecker {
   }
 
   async closeIssue (issue) {
-      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), () => '[x]');
+      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), '[x]');
       console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`))
       console.log(issue.body)
 
-      const alertCheckbox = issue.body.match(/\[x\]/);
-
-      console.log(alertCheckbox)
+      const alertCheckbox = issue.body.match(/\[ \]/);
 
       return this.github.rest.issues.update({
           owner:        this.context.owner,
           repo:         this.issueRepo,
           issue_number: issue.number,
-        //   state:        !alertCheckbox ? STATES.closed : STATES.open,
+          state:        !alertCheckbox ? STATES.closed : STATES.open,
           body:         issue.body,
       });
   }
