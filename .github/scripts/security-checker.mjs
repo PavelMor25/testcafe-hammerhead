@@ -90,7 +90,7 @@ class SecurityChecker {
           const alert = this.alertDictionary[key];
 
           if (alert.type === ALERT_TYPES.dependabot) {
-              const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))`));
+              const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))`), 'g');
 
               console.log(matchAlertInIssue)
               if (!matchAlertInIssue) 
