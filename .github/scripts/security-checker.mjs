@@ -77,7 +77,6 @@ class SecurityChecker {
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
           const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);
 
-          console.log(repo)
           if (!url)
               return res;
 
@@ -132,7 +131,11 @@ class SecurityChecker {
   }
 
   needUpdateIssue (alert) {
+    console.log('update')
+    console.log(alert)
+    console.log('----')
     const existIssue = this.alertDictionary[alert.security_advisory.summary]
+    console.log(existIssue)
     return existIssue 
         && existIssue.cveId === alert.security_advisory.cve_id
         && existIssue.ghsaId === alert.security_advisory.ghsa_Id
@@ -195,9 +198,9 @@ class SecurityChecker {
   }
 
   needCreateIssue (alert) {
-      console.log('alertCheck')
-      console.log(!this.alertDictionary[alert.security_advisory.summary])
-      console.log(Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24)
+    //   console.log('alertCheck')
+    //   console.log(!this.alertDictionary[alert.security_advisory.summary])
+    //   console.log(Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24)
       return !this.alertDictionary[alert.security_advisory.summary];
   }
 
