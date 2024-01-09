@@ -127,7 +127,7 @@ class SecurityChecker {
   }
 
   async closeIssue (issue) {
-      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), () => `stare`);
+      issue.body = issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), () => '[x]');
       console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`))
       console.log(issue.body)
 
