@@ -128,8 +128,12 @@ class SecurityChecker {
 
   async closeIssue (issue) {
       issue.body = issue.body.replace(new RegExp(`[ ](?= \`${this.context.repo}\`)`), () => '[x]');
+      console.log(new RegExp(`[ ](?= \`${this.context.repo}\`)`))
+      console.log(issue.body)
 
       const alertCheckbox = issue.body.match('[x]');
+
+      console.log(alertCheckbox)
 
       return this.github.rest.issues.update({
           owner:        this.context.owner,
