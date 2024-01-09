@@ -74,9 +74,10 @@ class SecurityChecker {
         console.log(issue.body)
           const [repo] = issue.body.match(/(?<=Repository:)[\s\S]*?(?=####|$)/g);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
-          const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
-          const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
+          const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
+          const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);
 
+          console.log(repo)
           if (!url)
               return res;
 
@@ -142,6 +143,7 @@ class SecurityChecker {
     const { issue } = this.alertDictionary[alert.security_advisory.summary]
 
     const body = issue.body.replace(/(?<=Repository:)[\s\S]*?(?=####|$)/g, (match) => {
+        console.log('match', match)
         return match += `- [ ] \`${this.context.repo}\`\n`;
     });
 
