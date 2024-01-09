@@ -145,7 +145,7 @@ class SecurityChecker {
     return this.github.rest.issues.update({
         owner:        this.context.owner,
         repo:         this.issueRepo,
-        issue_number: issueNumber,
+        issue_number: issue.issue.number,
         body,
     });
 
