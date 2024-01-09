@@ -130,7 +130,7 @@ class SecurityChecker {
       issue.body = issue.body.replace(new RegExp(`\[ \](?= \`${this.context.repo}\`)`), (s) => {
         console.log('ss',s)
     });
-      console.log(new RegExp(`[ ](?= \`${this.context.repo}\`)`))
+      console.log(new RegExp(`\[ \](?= \`${this.context.repo}\`)`))
       console.log(issue.body)
 
       const alertCheckbox = issue.body.match(/\[x\]/);
