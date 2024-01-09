@@ -203,7 +203,6 @@ class SecurityChecker {
   }
 
   needCreateIssue (alert) {
-    //   console.log(Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24)
       return !this.alertDictionary[alert.security_advisory.summary];
   }
 
