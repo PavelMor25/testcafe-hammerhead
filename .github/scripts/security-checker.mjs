@@ -1,3 +1,5 @@
+import { match } from "assert";
+
 const STATES = {
   open:   'open',
   closed: 'closed',
@@ -128,19 +130,37 @@ class SecurityChecker {
   }
 
   needUpdateIssue (alert) {
-    console.log(this.alertDictionary[alert.security_advisory.summary], this.alertDictionary[alert.security_advisory.summary].repo.search(this.context.repo))
     return this.alertDictionary[alert.security_advisory.summary] && this.alertDictionary[alert.security_advisory.summary].repo.search(this.context.repo) === -1
+  }
+
+  async updateIssue (alert) {
+    const issue = this.alertDictionary[alert.security_advisory.summary]
+
+    const body = issue.body.replace(/Repository:\s*`(.*)`/, (match) => {
+        return match += `, ${this.context.repo}`;
+    });
+
+    console.log(body)
+
+    return this.github.rest.issues.update({
+        owner:        this.context.owner,
+        repo:         this.issueRepo,
+        issue_number: issueNumber,
+        body,
+    });
+
   }
 
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
           if (this.needUpdateIssue(alert)) {
               console.log('update')
-              return
+              await this.updateIssue(alert)
+              continue
           }
 
           if (!this.needCreateIssue(alert))
-              return;
+              continue;
 
 
 
