@@ -134,7 +134,7 @@ class SecurityChecker {
       return this.github.rest.issues.update({
           owner:        this.context.owner,
           repo:         this.issueRepo,
-          issue_number: issueNumber,
+          issue_number: issue.number,
           state:        !alertCheckbox ? STATES.closed : STATES.open,
           body:         issue.body,
       });
