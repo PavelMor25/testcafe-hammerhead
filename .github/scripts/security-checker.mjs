@@ -92,12 +92,11 @@ class SecurityChecker {
           if (alert.type === ALERT_TYPES.dependabot) {
 
               const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - Link:\\s*(https:.*/(dependabot|code-scanning)/(\\d+))`));
-              console.log(new RegExp(`\`${this.context.repo}\` - Link:\\s*(https:.*/(dependabot|code-scanning)/(\\d+))`))
-              console.log(matchAlertInIssue)
               if (!matchAlertInIssue) 
                 continue;
 
               const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
+              console.log(isAlertOpened)
 
               if (isAlertOpened)
                   continue;
