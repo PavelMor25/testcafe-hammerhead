@@ -130,17 +130,19 @@ class SecurityChecker {
   }
 
   needUpdateIssue (alert) {
-    return this.alertDictionary[alert.security_advisory.summary] && this.alertDictionary[alert.security_advisory.summary].repo.search(this.context.repo) === -1
+    const existIssue = this.alertDictionary[alert.security_advisory.summary]
+    return existIssue 
+        && existIssue.cveId === alert.security_advisory.cve_id
+        && existIssue.ghsaId === alert.security_advisory.ghsa_Id
+        && existIssue.repo.search(this.context.repo) === -1;
   }
 
   async updateIssue (alert) {
     const issue = this.alertDictionary[alert.security_advisory.summary]
 
     const body = issue.body.replace(/Repository:\s*`(.*)`/, (match) => {
-        return match += `, ${this.context.repo}`;
+        return match += `-[] \`${this.context.repo}\`\n`;
     });
-
-    console.log(body)
 
     return this.github.rest.issues.update({
         owner:        this.context.owner,
@@ -154,15 +156,12 @@ class SecurityChecker {
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
           if (this.needUpdateIssue(alert)) {
-              console.log('update')
               await this.updateIssue(alert)
               continue
           }
 
           if (!this.needCreateIssue(alert))
               continue;
-
-
 
           await this.createIssue({
               labels:       [LABELS.dependabot, LABELS.security, alert.dependency.scope],
@@ -202,7 +201,7 @@ class SecurityChecker {
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
       const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
       let body = ''
-                    + `#### Repository: \`${originRepo}\`\n`
+                    + `#### Repository:\n-[] \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
