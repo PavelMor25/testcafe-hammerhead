@@ -140,7 +140,9 @@ class SecurityChecker {
               description:  alert.security_advisory.description,
               link:         alert.html_url,
               issuePackage: alert.dependency.package.name,
-          });
+              cveId:        alert.security_advisory.cve_id,
+              ghsaId:       alert.security_advisory.ghsa_id,
+        });
       }
   }
 
