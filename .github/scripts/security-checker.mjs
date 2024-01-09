@@ -31,7 +31,7 @@ class SecurityChecker {
 
       this.alertDictionary = this.createAlertDictionary(existedIssues);
 
-      await this.closeSpoiledIssues();
+    //   await this.closeSpoiledIssues();
       await this.createDependabotlIssues(dependabotAlerts);
       await this.createCodeqlIssues(codeqlAlerts);
   }
@@ -70,12 +70,14 @@ class SecurityChecker {
   createAlertDictionary (existedIssues) {
       return existedIssues.reduce((res, issue) => {
           const [, repo] = issue.body.match(/Repository:\s*`(.*)`/);
-          const [, url, type, number] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
+          const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
+          const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
+          const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
 
-          if (!url || repo !== this.context.repo)
+          if (!url)
               return res;
 
-          res[url] = { issue, number, type };
+          res[issue.title] = { issue, type, cveId, ghsaId, repo };
 
           return res;
       }, {});
@@ -152,7 +154,7 @@ class SecurityChecker {
               summary:     alert.rule.description,
               description: alert.most_recent_instance.message.text,
               link:        alert.html_url,
-          });
+          }, false);
       }
   }
 
@@ -160,14 +162,17 @@ class SecurityChecker {
       return !this.alertDictionary[alert.html_url] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
   }
 
-  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }) {
-      const title = `[${originRepo}] ${summary}`;
+  async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }, isDependabotAlert = true) {
+      const title = `[${originRepo}]${isDependabotAlert ? '' : ' ' + summary}`;
       const body = ''
                     + `#### Repository: \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
                     + `#### Description:\n`
                     + `${description}\n`
                     + `#### Link: ${link}`;
+
+        if  (isDependabotAlert)
+            body += `#### CVE ID: \`${cveId}\`\n #### GHSA ID: \`${ghsaId}\``;
 
       return this.github.rest.issues.create({
           title, body, labels,
