@@ -159,11 +159,11 @@ class SecurityChecker {
   }
 
   needCreateIssue (alert) {
-      return !this.alertDictionary[alert.html_url] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
+      return !this.alertDictionary[alert.security_advisory.summary] && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
   }
 
   async createIssue ({ labels, originRepo, summary, description, link, issuePackage = '' }, isDependabotAlert = true) {
-      const title = `[${originRepo}]${isDependabotAlert ? '' : ' ' + summary}`;
+      const title = isDependabotAlert ? `${summary}` : `[${originRepo}] ${summary}`;
       const body = ''
                     + `#### Repository: \`${originRepo}\`\n`
                     + (issuePackage ? `#### Package: \`${issuePackage}\`\n` : '')
