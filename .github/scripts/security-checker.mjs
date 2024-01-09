@@ -71,8 +71,8 @@ class SecurityChecker {
 
   createAlertDictionary (existedIssues) {
       return existedIssues.reduce((res, issue) => {
-          console.log(issue.body.match(/(?<=Repository:\n)(.*\n)*(?=###)/g))
-          const [repo] = issue.body.match(/(?<=Repository:\n)(.*\n)*(?=###)/g);
+          console.log(issue.body.match(/(?<=Repository:\n)[\s\S]*?(?=####|$)/g))
+          const [repo] = issue.body.match(/(?<=Repository:\n)[\s\S]*?(?=####|$)/g);
           const [, url, type] = issue.body.match(/Link:\s*(https:.*\/(dependabot|code-scanning)\/(\d+))/);
           const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);;
           const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);;
@@ -141,7 +141,7 @@ class SecurityChecker {
   async updateIssue (alert) {
     const { issue } = this.alertDictionary[alert.security_advisory.summary]
 
-    const body = issue.body.replace(/(?<=Repository:\n)(.*\n)*(?=###)/g, (match) => {
+    const body = issue.body.replace(/(?<=Repository:\n)[\s\S]*?(?=####|$)/g, (match) => {
         return match += `- [ ] \`${this.context.repo}\`\n`;
     });
 
