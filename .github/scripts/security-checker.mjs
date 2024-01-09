@@ -127,11 +127,22 @@ class SecurityChecker {
       });
   }
 
+  needUpdateIssue (alert) {
+    console.log(this.alertDictionary[alert.security_advisory.summary], this.alertDictionary[alert.security_advisory.summary].repo.search(this.context.repo))
+    return this.alertDictionary[alert.security_advisory.summary] && this.alertDictionary[alert.security_advisory.summary].repo.search(this.context.repo) === -1
+  }
+
   async createDependabotlIssues (dependabotAlerts) {
     for (const alert of dependabotAlerts) {
-        console.log(alert, !this.needCreateIssue(alert))
+          if (this.needUpdateIssue(alert)) {
+              console.log('update')
+              return
+          }
+
           if (!this.needCreateIssue(alert))
               return;
+
+
 
           await this.createIssue({
               labels:       [LABELS.dependabot, LABELS.security, alert.dependency.scope],
@@ -178,7 +189,7 @@ class SecurityChecker {
                     + `#### Link: ${link}`;
 
         if  (isDependabotAlert)
-            body += `#### CVE ID: \`${cveId}\`\n #### GHSA ID: \`${ghsaId}\``;
+            body += `\n#### CVE ID: \`${cveId}\`\n #### GHSA ID: \`${ghsaId}\``;
 
       return this.github.rest.issues.create({
           title, body, labels,
