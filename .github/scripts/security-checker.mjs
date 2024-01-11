@@ -104,7 +104,7 @@ const STATES = {
   
                 const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
   
-                if (isAlertOpened)
+                if (!isAlertOpened)
                     continue;
   
                 await this.updateIssue(alert, UPDATE_TYPE.closeTask);
