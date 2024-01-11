@@ -83,7 +83,7 @@ const STATES = {
                 const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
                 const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);
 
-                res.set(issue.title, { issue, type, cveId, ghsaId});
+                res.set(issue.title, { issue, type, cveId, ghsaId });
             } 
             else 
                 res.set(issue.title, { issue, type })
@@ -185,7 +185,7 @@ const STATES = {
         return existIssue 
             && existIssue.cveId === alert.security_advisory.cve_id
             && existIssue.ghsaId === alert.security_advisory.ghsa_id
-            && !existIssue.repo.includes(`\`${this.context.repo}\``);
+            && !existIssue.issue.body.includes(`\`${this.context.repo}\``);
   }
   
     async createCodeqlIssues (codeqlAlerts) {
