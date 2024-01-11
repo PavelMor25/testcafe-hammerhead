@@ -13,6 +13,11 @@ const STATES = {
     dependabot: 'dependabot',
     codeq:      'codeql',
   }
+
+  const UPDATE_TYPE = {
+    addAlertToIssue: 'addAlertToIssue',
+    closeTask:       'closeTask'
+  }
   
   class SecurityChecker {
     constructor (github, context, issueRepo) {
@@ -69,15 +74,20 @@ const STATES = {
   
     createAlertDictionary (existedIssues) {
         return existedIssues.reduce((res, issue) => {
-            const [reps] = issue.body.match(/(?<=Repository:)[\s\S]*?(?=####|$)/g);
-            const [, url, type, number] = issue.body.match(new RegExp(`\`${this.context.repo}\` - (https:.*/(dependabot|code-scanning)/(\\d+))`));
-            const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
-            const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);
-  
+            const [, url, type] = issue.body.match(/(https:.*\/(dependabot|code-scanning)\/(\d+))/);
+
             if (!url)
                 return res;
   
-            res.set(issue.title, { issue, type, cveId, ghsaId})
+            if (type === ALERT_TYPES.dependabot) {
+                const [, cveId] = issue.body.match(/CVE ID:\s*`(.*)`/);
+                const [, ghsaId] = issue.body.match(/GHSA ID:\s*`(.*)`/);
+
+                res.set(issue.title, { issue, type, cveId, ghsaId});
+            } 
+            else 
+                res.set(issue.title, { issue, type })
+  
   
             return res;
         }, new Map());
@@ -97,7 +107,7 @@ const STATES = {
                 if (isAlertOpened)
                     continue;
   
-                await this.updateIssue(alert.issue);
+                await this.updateIssue(alert, UPDATE_TYPE.closeTask);
             }
         }
     }
@@ -122,17 +132,29 @@ const STATES = {
         }
     }
   
-    async updateIssue ({ body, number}) {
-        const updatedBody = body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), '[x]');
-    
-        const allTasksResolved = body.match(/\[ \]/);
+    async updateIssue (alert, type) {
+        const updates = {};
+
+        if (type === UPDATE_TYPE.addAlertToIssue) {
+            const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
+  
+            updates.body = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
+                return match += `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
+            });
+
+            updates.issue_number = issue.number;
+        }
+
+        if (type === UPDATE_TYPE.closeTask) {
+            updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), '[x]');
+            updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
+            updates.issue_number = alert.issue.number;
+        }
     
         return this.github.rest.issues.update({
             owner:        this.context.owner,
             repo:         this.issueRepo,
-            issue_number: number,
-            state:        !allTasksResolved ? STATES.closed : STATES.open,
-            body:         updatedBody,
+            ...updates,
         });
     }
   
@@ -140,49 +162,30 @@ const STATES = {
     async createDependabotlIssues (dependabotAlerts) {
         for (const alert of dependabotAlerts) {
             if (this.needAddAlertToIssue(alert)) {
-                await this.addAlertToIssue(alert);
-                continue;
-              }
-              
-              if (!this.needCreateIssue(alert))
-                continue;
-          
-          await this.createIssue({
-              labels:       [LABELS.dependabot, LABELS.security, alert.dependency.scope],
-              originRepo:   this.context.repo,
-              summary:      alert.security_advisory.summary,
-              description:  alert.security_advisory.description,
-              link:         alert.html_url,
-              issuePackage: alert.dependency.package.name,
-              cveId:        alert.security_advisory.cve_id,
-              ghsaId:       alert.security_advisory.ghsa_id,
-          });
-      }
-  }
+                await this.updateIssue(alert, UPDATE_TYPE.addAlertToIssue);
+            }
+            else if (this.needCreateIssue(alert)) {
+                await this.createIssue({
+                    labels:       [LABELS.dependabot, LABELS.security, alert.dependency.scope],
+                    originRepo:   this.context.repo,
+                    summary:      alert.security_advisory.summary,
+                    description:  alert.security_advisory.description,
+                    link:         alert.html_url,
+                    issuePackage: alert.dependency.package.name,
+                    cveId:        alert.security_advisory.cve_id,
+                    ghsaId:       alert.security_advisory.ghsa_id,
+                });
+            }
+        }
+    }
   
   needAddAlertToIssue (alert) {
       const existIssue = this.alertDictionary.get(alert.security_advisory.summary);
   
-      return existIssue 
-          && existIssue.cveId === alert.security_advisory.cve_id
-          && existIssue.ghsaId === alert.security_advisory.ghsa_id
-          && existIssue.repo.includes(`\`${this.context.repo}\``);
-  }
-  
-  async addAlertToIssue (alert) {
-      const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
-  
-      const body = issue.body.replace(/(?<=Repository:)[\s\S]*?(?=####|$)/g, (match) => {
-          return match += `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
-      });
-  
-      return this.github.rest.issues.update({
-          owner:        this.context.owner,
-          repo:         this.issueRepo,
-          issue_number: issue.number,
-          body,
-      });
-  
+        return existIssue 
+            && existIssue.cveId === alert.security_advisory.cve_id
+            && existIssue.ghsaId === alert.security_advisory.ghsa_id
+            && !existIssue.repo.includes(`\`${this.context.repo}\``);
   }
   
     async createCodeqlIssues (codeqlAlerts) {
