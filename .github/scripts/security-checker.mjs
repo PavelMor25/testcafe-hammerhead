@@ -104,7 +104,7 @@ const STATES = {
   
                 const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[1]);
   
-                if (!isAlertOpened)
+                if (isAlertOpened)
                     continue;
   
                 await this.updateIssue(alert, UPDATE_TYPE.closeTask);
@@ -138,11 +138,11 @@ const STATES = {
         if (type === UPDATE_TYPE.addAlertToIssue) {
             const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
   
-            updates.body = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
+            updates.issue_number = issue.number;
+            updates.body         = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
                 return match += `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
             });
 
-            updates.issue_number = issue.number;
         }
 
         if (type === UPDATE_TYPE.closeTask) {
