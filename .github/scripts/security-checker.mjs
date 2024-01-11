@@ -97,7 +97,7 @@ const STATES = {
         for (const alert of this.alertDictionary.values()) {
   
             if (alert.type === ALERT_TYPES.dependabot) {
-                const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - https:.*/dependabot/(\\d+))`));
+                const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - https:.*/dependabot/(\\d+)`));
   
                 if (!matchAlertInIssue) 
                     continue;
