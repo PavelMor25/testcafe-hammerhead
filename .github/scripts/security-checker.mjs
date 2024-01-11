@@ -97,12 +97,12 @@ const STATES = {
         for (const alert of this.alertDictionary.values()) {
   
             if (alert.type === ALERT_TYPES.dependabot) {
-                const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - (https:.*/(dependabot|code-scanning)/(\\d+))`));
+                const matchAlertInIssue = alert.issue.body.match(new RegExp(`\`${this.context.repo}\` - https:.*/dependabot/(\\d+))`));
   
                 if (!matchAlertInIssue) 
                     continue;
   
-                const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[3]);
+                const isAlertOpened = await this.isDependabotAlertOpened(matchAlertInIssue[1]);
   
                 if (!isAlertOpened)
                     continue;
