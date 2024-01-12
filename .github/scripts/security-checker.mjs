@@ -172,12 +172,6 @@ class SecurityChecker {
         const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
         const alertNumbers      = existedIssue?.issue.body.match(regExpAlertNumber) || [];
 
-        console.log('needAddAlertToIssue')
-        console.log(existedIssue)
-        console.log('sssss')
-        console.log(alertNumbers)
-        console.log('sssss')
-
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
             && existedIssue.ghsaId === alert.security_advisory.ghsa_id
@@ -186,6 +180,9 @@ class SecurityChecker {
 
     isAlertInIssue(issue, alert, alertNumbers) {
         const isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
+        console.log(isAlertExisted)
+        console.log(alert.html_url.match(/(?<=https:.*\/)\d+/))
+        console.log(alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/)))
         return !isAlertExisted || isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/));
     }
 
