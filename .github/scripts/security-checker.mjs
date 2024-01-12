@@ -189,7 +189,12 @@ class SecurityChecker {
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
             && existedIssue.ghsaId === alert.security_advisory.ghsa_id
-            && (!existedIssue.issue.body.includes(`\`${this.context.repo}\``) || !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/)));
+            && this.isAlertInIssue(existedIssue.issue, alert, alertNumbers);
+    }
+
+    isAlertInIssue(issue, alert, alertNumbers) {
+        isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
+        return !isAlertExisted || isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/));
     }
 
     async addAlertToIssue(alert) {
