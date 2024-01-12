@@ -98,8 +98,9 @@ class SecurityChecker {
                 if (!alertNumbers)
                     continue;
 
+                console.log('номера' , alertNumbers)
                 for (let alertNumber of  alertNumbers) {
-                    console.log(alertNumber)
+                    console.log('номер', alertNumber)
                     const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
 
                     if (!isAlertOpened)
@@ -180,8 +181,9 @@ class SecurityChecker {
 
     isAlertInIssue(issue, alert, alertNumbers) {
         const isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
-        console.log(isAlertExisted)
-        console.log(alert.html_url.match(/(?<=https:.*\/)\d+/))
+        console.log('exist', isAlertExisted)
+        console.log('номер', alert.html_url.match(/(?<=https:.*\/)\d+/))
+        console.log('номерf', alertNumbers)
         console.log(alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/)))
         return !isAlertExisted || isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/));
     }
