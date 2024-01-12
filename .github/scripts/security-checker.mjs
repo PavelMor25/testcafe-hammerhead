@@ -234,7 +234,7 @@ class SecurityChecker {
     needCreateIssue(alert, isDependabotAlert = true) {
         const dictionaryKey = isDependabotAlert ? alert.security_advisory.summary : `[${this.context.repo}] ${alert.rule.description}`;
 
-        return !this.alertDictionary.get(dictionaryKey) && Date.now() - new Date(alert.created_at) <= 1000 * 60 * 60 * 24;
+        return !this.alertDictionary.get(dictionaryKey);
     }
 
     async createIssue({ labels, originRepo, summary, description, link, issuePackage = '', cveId, ghsaId }, isDependabotAlert = true) {
