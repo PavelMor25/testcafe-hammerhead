@@ -95,6 +95,8 @@ class SecurityChecker {
             if (alert.type === ALERT_TYPES.dependabot) {
                 const alertNumbers  = alert.issue.body.match(regExpAlertNumber);
 
+                console.log(alertNumbers)
+
                 if (!alertNumbers)
                     continue;
 
@@ -152,7 +154,6 @@ class SecurityChecker {
 
     async createDependabotlIssues(dependabotAlerts) {
         for (const alert of dependabotAlerts) {
-            console.log(this.needAddAlertToIssue(alert))
             if (this.needAddAlertToIssue(alert)) {
                 await this.addAlertToIssue(alert);
             }
