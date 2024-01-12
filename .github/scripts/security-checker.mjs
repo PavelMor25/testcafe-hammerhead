@@ -89,7 +89,7 @@ class SecurityChecker {
     }
 
     async closeSpoiledIssues() {
-        const regExpAlertNumber = new RegExp(`(?<=[ ] \`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
+        const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
         for (const alert of this.alertDictionary.values()) {
 
             if (alert.type === ALERT_TYPES.dependabot) {
