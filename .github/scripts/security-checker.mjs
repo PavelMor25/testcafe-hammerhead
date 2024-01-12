@@ -94,22 +94,29 @@ class SecurityChecker {
     }
 
     async closeSpoiledIssues() {
-        const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
+        const regExpAlertNumber = new RegExp(`(?<=[ ] \`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
         for (const alert of this.alertDictionary.values()) {
 
             if (alert.type === ALERT_TYPES.dependabot) {
-                const alertNumber  = alert.issue.body.match(regExpAlertNumber);
-                console.log(alertNumber)
+                const alertNumbers  = alert.issue.body.match(regExpAlertNumber);
 
-                if (!alertNumber)
+                if (!alertNumbers)
                     continue;
 
-                const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
+                for (let alertNumber in  alertNumbers) {
+                    const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
 
-                if (!isAlertOpened)
-                    continue;
+                    if (!isAlertOpened)
+                        continue;
+    
+                    const updates = {}
 
-                await this.updateIssue(alert, UPDATE_TYPE.closeTask);
+                    updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`- https:.*/dependabot/${alertNumber})`), '[x]');
+                    updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
+                    updates.issue_number = alert.issue.number;
+                       
+                    await this.updateIssue(updates);
+                }
             }
         }
     }
@@ -134,8 +141,7 @@ class SecurityChecker {
         }
     }
 
-    async updateIssue(alert, type) {
-        const updates = {};
+    async updateIssue(updates) {
 
         if (type === UPDATE_TYPE.addAlertToIssue) {
             const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
@@ -144,12 +150,6 @@ class SecurityChecker {
             updates.body         = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
                 return match + `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
             });
-        }
-
-        if (type === UPDATE_TYPE.closeTask) {
-            updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`)`), '[x]');
-            updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
-            updates.issue_number = alert.issue.number;
         }
 
         return this.github.rest.issues.update({
@@ -163,7 +163,7 @@ class SecurityChecker {
     async createDependabotlIssues(dependabotAlerts) {
         for (const alert of dependabotAlerts) {
             if (this.needAddAlertToIssue(alert)) {
-                await this.updateIssue(alert, UPDATE_TYPE.addAlertToIssue);
+                await this.addAlertToIssue(alert);
             }
             else if (this.needCreateIssue(alert)) {
                 await this.createIssue({
@@ -181,12 +181,26 @@ class SecurityChecker {
     }
 
     needAddAlertToIssue(alert) {
-        const existedIssue = this.alertDictionary.get(alert.security_advisory.summary);
+        const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
+        const alertNumbers      = alert.issue.body.match(regExpAlertNumber) || [];
+        const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
             && existedIssue.ghsaId === alert.security_advisory.ghsa_id
-            && !existedIssue.issue.body.includes(`\`${this.context.repo}\``);
+            && (!existedIssue.issue.body.includes(`\`${this.context.repo}\``) || !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/)));
+    }
+
+    async addAlertToIssue(alert) {
+        const updates   =  {};
+        const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
+
+        updates.issue_number = issue.number;
+        updates.body         = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
+            return match + `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
+        });
+
+        await this.updateIssue(updates);
     }
 
     async createCodeqlIssues(codeqlAlerts) {
