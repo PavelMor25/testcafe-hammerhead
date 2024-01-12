@@ -191,7 +191,7 @@ class SecurityChecker {
         console.log('sssss')
         console.log(alertNumbers)
         console.log('sssss')
-        console.log(this.isAlertInIssue(existedIssue.issue, alert, alertNumbers))
+        // console.log(this.isAlertInIssue(existedIssue.issue, alert, alertNumbers))
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
