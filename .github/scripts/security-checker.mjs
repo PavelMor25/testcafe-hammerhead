@@ -98,9 +98,7 @@ class SecurityChecker {
                 if (!alertNumbers)
                     continue;
 
-                console.log('номераааааааа' , alertNumbers)
                 for (let alertNumber of  alertNumbers) {
-                    console.log('номер', alertNumber)
                     const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
 
                     if (!isAlertOpened)
@@ -149,7 +147,6 @@ class SecurityChecker {
 
     async createDependabotlIssues(dependabotAlerts) {
         for (const alert of dependabotAlerts) {
-            console.log(this.needAddAlertToIssue(alert))
             if (this.needAddAlertToIssue(alert)) {
                 await this.addAlertToIssue(alert);
             }
