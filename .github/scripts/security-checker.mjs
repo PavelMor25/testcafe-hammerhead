@@ -103,7 +103,7 @@ class SecurityChecker {
                 if (!alertNumbers)
                     continue;
 
-                for (let alertNumber in  alertNumbers) {
+                for (let alertNumber of  alertNumbers) {
                     const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
 
                     if (!isAlertOpened)
@@ -191,7 +191,6 @@ class SecurityChecker {
         console.log('sssss')
         console.log(alertNumbers)
         console.log('sssss')
-        // console.log(this.isAlertInIssue(existedIssue.issue, alert, alertNumbers))
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
