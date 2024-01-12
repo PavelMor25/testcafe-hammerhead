@@ -185,7 +185,7 @@ class SecurityChecker {
     }
 
     isAlertInIssue(issue, alert, alertNumbers) {
-        isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
+        const isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
         return !isAlertExisted || isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/));
     }
 
