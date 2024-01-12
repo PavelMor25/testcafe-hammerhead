@@ -186,6 +186,13 @@ class SecurityChecker {
         const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
         const alertNumbers      = existedIssue?.issue.body.match(regExpAlertNumber) || [];
 
+        console.log('needAddAlertToIssue')
+        console.log(existedIssue)
+        console.log('sssss')
+        console.log(alertNumbers)
+        console.log('sssss')
+        console.log(this.isAlertInIssue(existedIssue.issue, alert, alertNumbers))
+
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
             && existedIssue.ghsaId === alert.security_advisory.ghsa_id
