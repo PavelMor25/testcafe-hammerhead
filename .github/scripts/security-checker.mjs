@@ -174,8 +174,9 @@ class SecurityChecker {
         const alertNumber       = existedIssue?.issue.body.match(regExpAlertNumber);
         console.log('3',alertNumber)
         const isAlertExisted    = existedIssue?.issue.body.includes(`\`${this.context.repo}\``);
-        console.log('4',alertNumber)
+        console.log('4',isAlertExisted)
         console.log('5',(isAlertExisted && !alertNumber))
+        console.log('6',!isAlertExisted||(isAlertExisted && !alertNumber))
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
