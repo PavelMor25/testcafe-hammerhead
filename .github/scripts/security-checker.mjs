@@ -166,20 +166,15 @@ class SecurityChecker {
     }
 
     needAddAlertToIssue(alert) {
-        const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
+        const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)${alert.html_url.match(/(?<=https:.*\/)\d+/)}`);
         const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
-        const alertNumbers      = existedIssue?.issue.body.match(regExpAlertNumber) || [];
+        const alertNumber       = existedIssue?.issue.body.match(regExpAlertNumber);
+        const isAlertExisted    = existedIssue?.issue.body.includes(`\`${this.context.repo}\``);
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
             && existedIssue.ghsaId === alert.security_advisory.ghsa_id
-            && this.isAlertInIssue(existedIssue.issue, alert, alertNumbers);
-    }
-
-    isAlertInIssue(issue, alert, alertNumbers) {
-        const isAlertExisted = issue.body.includes(`\`${this.context.repo}\``);
-        console.log(!isAlertExisted, isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/)))
-        return !isAlertExisted || isAlertExisted && !alertNumbers.includes(alert.html_url.match(/(?<=https:.*\/)\d+/));
+            && (!isAlertExisted || (isAlertExisted && !alertNumber));
     }
 
     async addAlertToIssue(alert) {
