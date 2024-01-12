@@ -95,7 +95,7 @@ class SecurityChecker {
             if (alert.type === ALERT_TYPES.dependabot) {
                 const alertNumbers  = alert.issue.body.match(regExpAlertNumber);
 
-                console.log(alertNumbers)
+                console.log('номера', alertNumbers)
 
                 if (!alertNumbers)
                     continue;
