@@ -100,14 +100,19 @@ class SecurityChecker {
 
                 for (let alertNumber of  alertNumbers) {
                     const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
+                    console.log(alertNumber)
+                    console.log(isAlertOpened)
 
                     if (!isAlertOpened)
                         continue;
     
                     const updates = {}
 
+
                     updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`- https:.*/dependabot/${alertNumber})`), '[x]');
+                    console.log(updates.body)
                     updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
+                    console.log(updates.body)
                     updates.issue_number = alert.issue.number;
                        
                     await this.updateIssue(updates);
@@ -168,15 +173,9 @@ class SecurityChecker {
 
     needAddAlertToIssue(alert) {
         const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)${alert.html_url.match(/(?<=https:.*\/)\d+/)}`);
-        console.log('1',regExpAlertNumber)
         const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
-        console.log('2',existedIssue)
         const alertNumber       = existedIssue?.issue.body.match(regExpAlertNumber);
-        console.log('3',alertNumber)
         const isAlertExisted    = existedIssue?.issue.body.includes(`\`${this.context.repo}\``);
-        console.log('4',isAlertExisted)
-        console.log('5',(isAlertExisted && !alertNumber))
-        console.log('6',!isAlertExisted||(isAlertExisted && !alertNumber))
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
