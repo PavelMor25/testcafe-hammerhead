@@ -182,8 +182,9 @@ class SecurityChecker {
 
     needAddAlertToIssue(alert) {
         const regExpAlertNumber = new RegExp(`(?<=\`${this.context.repo}\` - https:.*/dependabot/)\\d+`);
-        const alertNumbers      = alert.issue.body.match(regExpAlertNumber) || [];
         const existedIssue      = this.alertDictionary.get(alert.security_advisory.summary);
+        console.log(existedIssue.issue.body.match(regExpAlertNumber))
+        const alertNumbers      = existedIssue.issue.body.match(regExpAlertNumber) || [];
 
         return existedIssue
             && existedIssue.cveId === alert.security_advisory.cve_id
