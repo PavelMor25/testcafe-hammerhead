@@ -14,11 +14,6 @@ const ALERT_TYPES = {
     codeq:      'codeql',
 }
 
-const UPDATE_TYPE = {
-    addAlertToIssue: 'addAlertToIssue',
-    closeTask:       'closeTask'
-}
-
 class SecurityChecker {
     constructor(github, context, issueRepo) {
         this.github    = github;
@@ -143,16 +138,6 @@ class SecurityChecker {
     }
 
     async updateIssue(updates) {
-
-        if (type === UPDATE_TYPE.addAlertToIssue) {
-            const { issue } = this.alertDictionary.get(alert.security_advisory.summary);
-
-            updates.issue_number = issue.number;
-            updates.body         = issue.body.replace(/(?<=Repositories:)[\s\S]*?(?=####|$)/g, (match) => {
-                return match + `- [ ] \`${this.context.repo}\` - ${alert.html_url}\n`;
-            });
-        }
-
         return this.github.rest.issues.update({
             owner: this.context.owner,
             repo:  this.issueRepo,
