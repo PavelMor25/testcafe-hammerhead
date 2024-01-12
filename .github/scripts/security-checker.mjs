@@ -98,7 +98,7 @@ class SecurityChecker {
                 if (!alertNumbers)
                     continue;
 
-                for (let alertNumber of  alertNumbers) {
+                for (let alertNumber of alertNumbers) {
                     const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
                     console.log('num', alertNumber)
                     console.log('isOpen', isAlertOpened)
