@@ -102,7 +102,7 @@ class SecurityChecker {
                     continue;
 
                 const updates = {};
-                const body    = alert.issue.body;
+                let body      = alert.issue.body;
 
                 for (let alertNumber of alertNumbers) {
                     // const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
