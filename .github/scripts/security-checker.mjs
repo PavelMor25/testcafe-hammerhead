@@ -102,12 +102,12 @@ class SecurityChecker {
                     continue;
 
                 for (let alertNumber of alertNumbers) {
-                    const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
+                    // const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
                     console.log('num', alertNumber)
                     console.log('isOpen', isAlertOpened)
 
-                    if (!isAlertOpened)
-                        continue;
+                    // if (!isAlertOpened)
+                    //     continue;
     
                     const updates = {}
 
