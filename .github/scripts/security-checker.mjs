@@ -113,7 +113,7 @@ class SecurityChecker {
 
 
                     console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\` - https:.*/dependabot/${alertNumber})`))
-                    updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\`- https:.*/dependabot/${alertNumber})`), '[x]');
+                    updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\` - https:.*/dependabot/${alertNumber})`), '[x]');
                     console.log(updates.body)
                     updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
                     console.log(updates.body)
