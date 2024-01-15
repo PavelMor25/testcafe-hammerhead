@@ -101,6 +101,9 @@ class SecurityChecker {
                 if (!alertNumbers)
                     continue;
 
+                const updates = {};
+                const body    = alert.issue.body;
+
                 for (let alertNumber of alertNumbers) {
                     // const isAlertOpened = await this.isDependabotAlertOpened(alertNumber);
                     console.log('num', alertNumber)
@@ -108,19 +111,15 @@ class SecurityChecker {
 
                     // if (!isAlertOpened)
                     //     continue;
-    
-                    const updates = {}
 
-
-                    console.log(new RegExp(`\\[ \\](?= \`${this.context.repo}\` - https:.*/dependabot/${alertNumber})`))
-                    updates.body         = alert.issue.body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\` - https:.*/dependabot/${alertNumber})`), '[x]');
-                    console.log(updates.body)
-                    updates.state        = !updates.body.match(/\[ \]/) ? STATES.closed : STATES.open;
-                    console.log(updates.body)
-                    updates.issue_number = alert.issue.number;
-                       
-                    await this.updateIssue(updates);
+                    body = body.replace(new RegExp(`\\[ \\](?= \`${this.context.repo}\` - https:.*/dependabot/${alertNumber})`), '[x]');
                 }
+
+                updates.body         = body;
+                updates.state        = !body.match(/\[ \]/) ? STATES.closed : STATES.open;
+                updates.issue_number = alert.issue.number;
+
+                await this.updateIssue(updates);
             }
         }
     }
