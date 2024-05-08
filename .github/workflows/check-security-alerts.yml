@@ -1,4 +1,4 @@
-name: Check security alerts
+name: Check security alerts 
 
 on:
   schedule:
@@ -17,20 +17,8 @@ jobs:
         with:
           github-token: ${{ secrets.ACTIVE_TOKEN }}
           script: |
-            const {default: SecurityChecker} = await import('${{ github.workspace }}/.github/scripts/security-checker.mjs')
+            const {default: StatisticGetter} = await import('${{ github.workspace }}/.github/scripts/statistic-getter.mjs')
 
-            const securityChecker = new SecurityChecker(github, context, '${{secrets.SECURITY_ISSUE_REPO}}');
+            const statisticGetter = new StatisticGetter(github, context, '${{secrets.SECURITY_ISSUE_REPO}}');
 
-            await securityChecker.check();
-  
-  keepalive-job:
-    name: Keepalive Workflow
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gautamkrishnar/keepalive-workflow@v2
-        with:
-          gh_token: ${{ secrets.ACTIVE_TOKEN }}
+            await statisticGetter.getStats();
